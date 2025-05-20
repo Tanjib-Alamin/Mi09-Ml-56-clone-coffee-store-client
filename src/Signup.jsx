@@ -9,33 +9,43 @@ const Signup = () => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
-    const { email, password, ...userProfile } = Object.fromEntries(
-      formData.entries()
-    );
-    console.log(email, password, userProfile);
+    const { email, password, ...restFormData } = Object.fromEntries(formData.entries());
+
+   
+      
+ 
 
     createUser(email, password)
       .then((result) => {
-        console.log(result.user);
+          console.log(result.user);
+          
+          const userProfile = {
+            email,
+            ...restFormData,
+            creationTime: result.user?.metadata?.creationTime,
+            lastSignInTime: result.user?.metadata?.lastSignInTime,
+          };
 
-          fetch("http://localhost:3000/users", {
-              method: 'POST',
-              headers: {
-                  'content-type' : 'application/json'
-              },
-              body: JSON.stringify(userProfile)
-          })
-              .then(res => res.json())
-              .then(data => {
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: "your account has created",
-                  showConfirmButton: false,
-                  timer: 1500,
-                });
-              console.log('after profile save', data);
-          })
+          console.log(email, password, userProfile);
+
+        fetch("http://localhost:3000/users", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(userProfile),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "your account has created",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            console.log("after profile save", data);
+          });
       })
       .catch((error) => {
         console.log(error);
